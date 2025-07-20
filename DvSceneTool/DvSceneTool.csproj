@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="R:\diEventLibRefactor2\DiEventLib\DvSceneLib\DvSceneLib.csproj" />
+    <ProjectReference Include="..\DvSceneLib\DvSceneLib\DvSceneLib.csproj" />
   </ItemGroup>
 
 </Project>

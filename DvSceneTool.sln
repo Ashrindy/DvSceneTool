@@ -5,9 +5,9 @@ VisualStudioVersion = 17.13.35931.197 d17.13
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DvSceneTool", "DvSceneTool\DvSceneTool.csproj", "{5F7E8D91-428D-462D-9C00-CD1F2FCB8E19}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DvSceneLib", "R:\diEventLibRefactor2\DiEventLib\DvSceneLib\DvSceneLib.csproj", "{D2E3B7CE-C5F7-537E-2B9C-E7D6EDB80AF1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DvSceneLib", "DvSceneLib\DvSceneLib\DvSceneLib.csproj", "{D2E3B7CE-C5F7-537E-2B9C-E7D6EDB80AF1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Amicitia.IO", "R:\diEventLibRefactor2\DiEventLib\Amicitia.IO\src\Amicitia.IO\Amicitia.IO.csproj", "{4B7BB6E7-FAC6-E2D0-0B2A-2BFD80D8EF69}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Amicitia.IO", "DvSceneLib\Amicitia.IO\src\Amicitia.IO\Amicitia.IO.csproj", "{4B7BB6E7-FAC6-E2D0-0B2A-2BFD80D8EF69}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
