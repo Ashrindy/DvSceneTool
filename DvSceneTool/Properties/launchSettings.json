@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "DvSceneTool": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

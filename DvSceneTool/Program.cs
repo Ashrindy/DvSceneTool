@@ -1,0 +1,168 @@
+﻿using Hexa.NET.ImGui;
+using Hexa.NET.ImGui.Backends.GLFW;
+using Hexa.NET.ImGui.Backends.OpenGL3;
+using Hexa.NET.ImGui.Utilities;
+using Hexa.NET.ImNodes;
+using Hexa.NET.ImPlot;
+using OpenTK.Graphics.OpenGL;
+using OpenTK.Windowing.Common;
+using OpenTK.Windowing.Desktop;
+using System.Diagnostics;
+
+class DvSceneToolApp : GameWindow
+{
+    public static string Version = "0.0.1";
+
+    ImGuiContextPtr imGuiCtx = ImGui.CreateContext();
+    ImPlotContextPtr imPlotCtx = ImPlot.CreateContext();
+    ImNodesContextPtr imNodesCtx = ImNodes.CreateContext();
+    Stopwatch stopWatch = new();
+    float fpsLimit = 60;
+    
+    public DvSceneToolApp(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings) : base(gameWindowSettings, nativeWindowSettings)
+    {
+        InitImGUI();
+        stopWatch.Start();
+    }
+
+    void InitImGUI()
+    {
+        ImGui.SetCurrentContext(imGuiCtx);
+        ImPlot.SetCurrentContext(imPlotCtx);
+        ImPlot.SetImGuiContext(imGuiCtx);
+        ImNodes.SetCurrentContext(imNodesCtx);
+        ImNodes.SetImGuiContext(imGuiCtx);
+
+        var io = ImGui.GetIO();
+        io.ConfigFlags |= ImGuiConfigFlags.DockingEnable;
+        io.DisplaySize = new(ClientSize.X, ClientSize.Y);
+
+        var style = ImGui.GetStyle();
+        style.FrameRounding = 4;
+        style.WindowBorderSize = 1;
+        style.FrameBorderSize = 0;
+        style.PopupBorderSize = 1;
+        style.WindowRounding = 4;
+        style.ChildRounding = 4;
+        style.FrameRounding = 4;
+        style.PopupRounding = 4;
+        style.ScrollbarRounding = 12;
+        style.CellPadding.X = 4;
+        style.CellPadding.Y = 2;
+        style.WindowTitleAlign.X = 0.50f;
+        style.SelectableTextAlign.X = 0.03f;
+        style.WindowMenuButtonPosition = ImGuiDir.Right;
+        style.Colors[(int)ImGuiCol.WindowBg] = new(0, 0, 0, 1);
+
+        InitImGUIFont();
+        InitImGUIGLFW();
+        InitImGUIOpenGL();
+    }
+
+    void InitImGUIFont()
+    {
+        ImGuiFontBuilder builder = new();
+        builder
+            .AddFontFromFileTTF("res/fonts/Inter.ttf", 14);
+        builder
+            .Config.RasterizerMultiply = 5f;
+        builder
+            .AddFontFromFileTTF("res/fonts/NotoSansJP-VariableFont_wght.ttf", 20, [0x0020, 0x00FF, 0x3000, 0x30FF, 0x31F0, 0x31FF, 0xFF00, 0xFFEF, 0x4E00, 0x9FAF])
+            .Build();
+    }
+
+    void InitImGUIOpenGL()
+    {
+        ImGuiImplOpenGL3.SetCurrentContext(ImGui.GetCurrentContext());
+        ImGuiImplOpenGL3.Init((string)null!);
+    }
+
+    void InitImGUIGLFW()
+    {
+        ImGuiImplGLFW.SetCurrentContext(ImGui.GetCurrentContext());
+        GLFWwindowPtr windowPtr = new();
+        unsafe
+        {
+            windowPtr.Handle = (GLFWwindow*)WindowPtr;
+        }
+        ImGuiImplGLFW.InitForOpenGL(windowPtr, true);
+    }
+
+    protected override void OnLoad() => base.OnLoad();
+
+    void FrameLimit()
+    {
+        float elapsedTime = (float)stopWatch.Elapsed.TotalSeconds;
+        stopWatch.Restart();
+        float frameTime = 1f / fpsLimit;
+        if (elapsedTime < frameTime)
+        {
+            Thread.Sleep((int)((frameTime - elapsedTime) * 1000));
+            elapsedTime = frameTime;
+        }
+    }
+
+    void ImGuiBegin()
+    {
+        ImGui.SetCurrentContext(imGuiCtx);
+        GL.Clear(ClearBufferMask.ColorBufferBit);
+        ImGui.SetNextFrameWantCaptureKeyboard(true);
+        ImGui.SetNextFrameWantCaptureMouse(true);
+        ImGuiImplOpenGL3.NewFrame();
+        ImGuiImplGLFW.NewFrame();
+        ImGui.NewFrame();
+    }
+
+    void ImGuiEnd()
+    {
+        var io = ImGui.GetIO();
+        ImGui.Render();
+        ImGuiImplOpenGL3.RenderDrawData(ImGui.GetDrawData());
+
+        if ((io.ConfigFlags & ImGuiConfigFlags.ViewportsEnable) != 0)
+        {
+            ImGui.UpdatePlatformWindows();
+            ImGui.RenderPlatformWindowsDefault();
+        }
+
+        SwapBuffers();
+    }
+
+    protected override void OnRenderFrame(FrameEventArgs args)
+    {
+        base.OnRenderFrame(args);
+
+        FrameLimit();
+        ImGuiBegin();
+
+        DvSceneTool.Context.Instance.Render();
+
+        ImGui.End();
+
+        ImGuiEnd();
+    }
+
+    protected override void OnResize(ResizeEventArgs e)
+    {
+        base.OnResize(e);
+        ImGui.GetIO().DisplaySize = new(e.Width, e.Height);
+    }
+
+    protected override void OnUnload() => base.OnUnload();
+
+    static void Main(string[] args)
+    {
+        Environment.CurrentDirectory = AppDomain.CurrentDomain.BaseDirectory;
+        var gameSettings = new GameWindowSettings();
+        var nativeSettings = new NativeWindowSettings
+        {
+            ClientSize = new(800, 600),
+            Title = "DvScene Tool",
+        };
+
+        using var window = new DvSceneToolApp(gameSettings, nativeSettings);
+        foreach (var i in args)
+            DvSceneTool.Context.Instance.LoadFile(i);
+        window.Run();
+    }
+}
