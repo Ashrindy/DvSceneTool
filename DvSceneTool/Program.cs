@@ -11,7 +11,9 @@ using System.Diagnostics;
 
 class DvSceneToolApp : GameWindow
 {
-    public static string Version = "0.0.1";
+    public static string Version = "0.0.2";
+    static DvSceneToolApp instance;
+    public static DvSceneToolApp Instance { get { return instance; } }
 
     ImGuiContextPtr imGuiCtx = ImGui.CreateContext();
     ImPlotContextPtr imPlotCtx = ImPlot.CreateContext();
@@ -37,22 +39,8 @@ class DvSceneToolApp : GameWindow
         io.ConfigFlags |= ImGuiConfigFlags.DockingEnable;
         io.DisplaySize = new(ClientSize.X, ClientSize.Y);
 
-        var style = ImGui.GetStyle();
-        style.FrameRounding = 4;
-        style.WindowBorderSize = 1;
-        style.FrameBorderSize = 0;
-        style.PopupBorderSize = 1;
-        style.WindowRounding = 4;
-        style.ChildRounding = 4;
-        style.FrameRounding = 4;
-        style.PopupRounding = 4;
-        style.ScrollbarRounding = 12;
-        style.CellPadding.X = 4;
-        style.CellPadding.Y = 2;
-        style.WindowTitleAlign.X = 0.50f;
-        style.SelectableTextAlign.X = 0.03f;
-        style.WindowMenuButtonPosition = ImGuiDir.Right;
-        style.Colors[(int)ImGuiCol.WindowBg] = new(0, 0, 0, 1);
+        ImGui.StyleColorsDark();
+        ImPlot.GetStyle().LineWeight = 4;
 
         InitImGUIFont();
         InitImGUIGLFW();
@@ -105,12 +93,17 @@ class DvSceneToolApp : GameWindow
     void ImGuiBegin()
     {
         ImGui.SetCurrentContext(imGuiCtx);
+        var color = ImGui.GetStyle().Colors[(int)ImGuiCol.WindowBg];
+        GL.ClearColor(color.X, color.Y, color.Z, color.W);
         GL.Clear(ClearBufferMask.ColorBufferBit);
         ImGui.SetNextFrameWantCaptureKeyboard(true);
         ImGui.SetNextFrameWantCaptureMouse(true);
         ImGuiImplOpenGL3.NewFrame();
         ImGuiImplGLFW.NewFrame();
         ImGui.NewFrame();
+
+        ImGui.ShowDemoWindow();
+        ImPlot.ShowDemoWindow();
     }
 
     void ImGuiEnd()
@@ -150,6 +143,8 @@ class DvSceneToolApp : GameWindow
 
     protected override void OnUnload() => base.OnUnload();
 
+    public void SetTitleBarName(string name) => Title = name;
+
     static void Main(string[] args)
     {
         Environment.CurrentDirectory = AppDomain.CurrentDomain.BaseDirectory;
@@ -160,9 +155,9 @@ class DvSceneToolApp : GameWindow
             Title = "DvScene Tool",
         };
 
-        using var window = new DvSceneToolApp(gameSettings, nativeSettings);
+        instance = new DvSceneToolApp(gameSettings, nativeSettings);
         foreach (var i in args)
             DvSceneTool.Context.Instance.LoadFile(i);
-        window.Run();
+        instance.Run();
     }
 }

@@ -58,7 +58,7 @@ public class MenuBar
             {
                 if (ImGui.BeginMenu("Template", Directory.Exists("templates")))
                 {
-                    var settings = SettingsManager.Instance.settings;
+                    ref var settings = ref SettingsManager.Instance.settings;
                     string[] templates = Directory.GetFiles("templates");
                     string pureName = settings.SelectedTemplateName;
                     if (ImGui.BeginCombo("###template", pureName))
@@ -67,7 +67,11 @@ public class MenuBar
                         {
                             bool selected = (pureName == Path.GetFileNameWithoutExtension(item));
                             if (ImGui.Selectable(Path.GetFileNameWithoutExtension(item), selected))
-                                settings.SelectedTemplateName = Path.GetFileName(item);
+                            {
+                                settings.SelectedTemplateName = Path.GetFileNameWithoutExtension(item);
+                                SettingsManager.Instance.Save();
+                                ctx.OpenDatabase(item);
+                            }
 
                             if (selected)
                                 ImGui.SetItemDefaultFocus();
@@ -78,6 +82,41 @@ public class MenuBar
 
                     ImGui.EndMenu();
                 }
+
+                if (ImGui.BeginMenu("Theme", Directory.Exists("themes")))
+                {
+                    ref var settings = ref SettingsManager.Instance.settings;
+                    string[] themes = Directory.GetFiles("themes");
+                    string pureName = settings.SelectedTheme;
+                    if (ImGui.BeginCombo("###theme", pureName))
+                    {
+                        foreach (var item in themes)
+                        {
+                            bool selected = (pureName == Path.GetFileNameWithoutExtension(item));
+                            if (ImGui.Selectable(Path.GetFileNameWithoutExtension(item), selected))
+                            {
+                                settings.SelectedTheme = Path.GetFileNameWithoutExtension(item);
+                                SettingsManager.Instance.Save();
+                                ThemesManager.Instance.SetTheme(item);
+                            }
+
+                            if (selected)
+                                ImGui.SetItemDefaultFocus();
+                        }
+
+                        ImGui.EndCombo();
+                    }
+
+                    ImGui.EndMenu();
+                }
+
+                ImGui.EndMenu();
+            }
+
+            if (ImGui.BeginMenu("View"))
+            {
+                foreach (var i in ctx.panels)
+                    ImGui.MenuItem(i.GetProperties().Name, "", ref i.Visible);
 
                 ImGui.EndMenu();
             }

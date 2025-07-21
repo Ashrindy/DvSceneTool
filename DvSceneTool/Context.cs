@@ -58,6 +58,9 @@ public sealed class Context
 
     public Context()
     {
+        _ = SettingsManager.Instance;
+        _ = ThemesManager.Instance;
+
         menuBar = new(this);
         AddPanel<NodeHierarchy>();
         AddPanel<NodeInspector>();
@@ -125,8 +128,9 @@ public sealed class Context
 
         ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 0);
         ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, 0);
+        ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding, new Vector2(0, 0));
         ImGui.Begin("DockSpace Window", windowFlags);
-        ImGui.PopStyleVar(2);
+        ImGui.PopStyleVar(3);
 
         ImGui.SetCursorPosY(ImGui.GetFrameHeight());
 
@@ -213,6 +217,8 @@ public sealed class Context
         LoadedScene = new();
         LoadedScene.Open(file, DiEvtDB);
         LoadedScenePath = file;
+
+        DvSceneToolApp.Instance.SetTitleBarName($"DvScene Tool - {Path.GetFileNameWithoutExtension(LoadedScenePath)}");
     }
 
     public void SaveFile(string file)
@@ -227,6 +233,8 @@ public sealed class Context
         LoadedScenePath = "";
 
         LoadedScene.Common.Node = new DvNodeTemplate(DiEvtDB.Nodes.Find(x => x.Descriptions.ContainsKey("rootNode") == true && x.Descriptions["rootNode"] == "true"));
+
+        DvSceneToolApp.Instance.SetTitleBarName($"DvScene Tool - New DvScene");
     }
     #endregion
 }

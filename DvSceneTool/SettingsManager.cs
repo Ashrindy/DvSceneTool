@@ -18,6 +18,9 @@ public class SettingsManager
         [JsonPropertyName("selectedTemplateName"), JsonPropertyOrder(0)]
         public string SelectedTemplateName { get; set; } = "rangers";
 
+        [JsonPropertyName("selectedTheme"), JsonPropertyOrder(1)]
+        public string SelectedTheme { get; set; } = "Light";
+
         public Settings() { }
     }
 
