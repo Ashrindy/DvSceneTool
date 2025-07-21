@@ -17,4 +17,4 @@ An editor powered by <a href="https://github.com/Ashrindy/DvSceneLib">DvSceneLib
 ## Credit
 
 - Inter font by <a href="https://github.com/rsms/inter](https://github.com/rsms/inter">rsms
-- NotoSansJP font by Adobe
+- NotoSansJP font by Google
