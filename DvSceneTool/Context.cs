@@ -229,12 +229,17 @@ public sealed class Context
 
     public void CreateFile()
     {
-        LoadedScene = new();
-        LoadedScenePath = "";
+        Close();
 
         LoadedScene.Common.Node = new DvNodeTemplate(DiEvtDB.Nodes.Find(x => x.Descriptions.ContainsKey("rootNode") == true && x.Descriptions["rootNode"] == "true"));
 
         DvSceneToolApp.Instance.SetTitleBarName($"DvScene Tool - New DvScene");
+    }
+
+    public void Close()
+    {
+        LoadedScene = new();
+        LoadedScenePath = "";
     }
     #endregion
 }

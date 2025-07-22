@@ -71,6 +71,8 @@ public class MenuBar
                             bool selected = (pureName == Path.GetFileNameWithoutExtension(item));
                             if (ImGui.Selectable(Path.GetFileNameWithoutExtension(item), selected))
                             {
+                                if(settings.SelectedTemplateName != Path.GetFileNameWithoutExtension(item))
+                                    ctx.Close();
                                 settings.SelectedTemplateName = Path.GetFileNameWithoutExtension(item);
                                 settingsMgr.Save();
                                 ctx.OpenDatabase(item);
