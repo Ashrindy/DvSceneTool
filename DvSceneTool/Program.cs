@@ -102,8 +102,10 @@ class DvSceneToolApp : GameWindow
         ImGuiImplGLFW.NewFrame();
         ImGui.NewFrame();
 
+#if DEBUG
         ImGui.ShowDemoWindow();
         ImPlot.ShowDemoWindow();
+#endif
     }
 
     void ImGuiEnd()
