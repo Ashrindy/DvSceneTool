@@ -12,22 +12,33 @@ public class ThemesManager
     static readonly ThemesManager instance = new();
     public static ThemesManager Instance { get { return instance; } }
 
+    public Dictionary<string, JsonDocument> Themes = new();
 
     public ThemesManager() => Init();
 
     void Init()
     {
+        Load();
+
+        SetTheme(SettingsManager.Instance.settings.SelectedTheme);
+    }
+
+    void Load() {
         if (!Directory.Exists("themes")) return;
 
-        SetTheme($"themes/{SettingsManager.Instance.settings.SelectedTheme}.json");
+        Themes.Clear();
+
+        foreach(var i in Directory.GetFiles("themes"))
+            Themes.Add(Path.GetFileNameWithoutExtension(i), JsonDocument.Parse(File.ReadAllText(i)));
     }
 
     public void SetTheme(string theme)
     {
+        if (!Themes.ContainsKey(theme)) return;
+
         ImGui.StyleColorsDark();
         var style = ImGui.GetStyle();
-        var json = File.ReadAllText(theme);
-        using var doc = JsonDocument.Parse(json);
+        var doc = Themes[theme];
         var root = doc.RootElement.GetProperty("Style");
 
         var styleType = typeof(ImGuiStyle);

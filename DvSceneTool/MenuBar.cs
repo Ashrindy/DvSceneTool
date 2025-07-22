@@ -1,5 +1,6 @@
 ﻿using Hexa.NET.ImGui;
 using Hexa.NET.ImGui.Widgets.Dialogs;
+using System.Text.Json;
 using System.Threading.Channels;
 
 namespace DvSceneTool;
@@ -86,18 +87,28 @@ public class MenuBar
                 if (ImGui.BeginMenu("Theme", Directory.Exists("themes")))
                 {
                     ref var settings = ref SettingsManager.Instance.settings;
-                    string[] themes = Directory.GetFiles("themes");
                     string pureName = settings.SelectedTheme;
                     if (ImGui.BeginCombo("###theme", pureName))
                     {
-                        foreach (var item in themes)
+                        foreach (var item in ThemesManager.Instance.Themes)
                         {
-                            bool selected = (pureName == Path.GetFileNameWithoutExtension(item));
-                            if (ImGui.Selectable(Path.GetFileNameWithoutExtension(item), selected))
+                            bool selected = (pureName == item.Key);
+                            if (ImGui.Selectable(item.Key, selected))
                             {
-                                settings.SelectedTheme = Path.GetFileNameWithoutExtension(item);
+                                settings.SelectedTheme = item.Key;
                                 SettingsManager.Instance.Save();
-                                ThemesManager.Instance.SetTheme(item);
+                                ThemesManager.Instance.SetTheme(item.Key);
+                            }
+
+                            var rootElement = item.Value.RootElement;
+                            JsonElement metadata;
+                            bool hasMetadata = rootElement.TryGetProperty("Metadata", out metadata);
+
+                            if (hasMetadata && ImGui.BeginItemTooltip())
+                            {
+                                foreach(var i in metadata.EnumerateObject())
+                                    ImGui.Text($"{i.Name}: {i.Value}");
+                                ImGui.EndTooltip();
                             }
 
                             if (selected)
