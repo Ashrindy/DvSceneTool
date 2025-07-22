@@ -57,9 +57,11 @@ public class MenuBar
             }*/
             if (ImGui.BeginMenu("Options"))
             {
+                var settingsMgr = SettingsManager.Instance;
+                ref var settings = ref settingsMgr.settings;
+
                 if (ImGui.BeginMenu("Template", Directory.Exists("templates")))
                 {
-                    ref var settings = ref SettingsManager.Instance.settings;
                     string[] templates = Directory.GetFiles("templates");
                     string pureName = settings.SelectedTemplateName;
                     if (ImGui.BeginCombo("###template", pureName))
@@ -70,7 +72,7 @@ public class MenuBar
                             if (ImGui.Selectable(Path.GetFileNameWithoutExtension(item), selected))
                             {
                                 settings.SelectedTemplateName = Path.GetFileNameWithoutExtension(item);
-                                SettingsManager.Instance.Save();
+                                settingsMgr.Save();
                                 ctx.OpenDatabase(item);
                             }
 
@@ -86,7 +88,6 @@ public class MenuBar
 
                 if (ImGui.BeginMenu("Theme", Directory.Exists("themes")))
                 {
-                    ref var settings = ref SettingsManager.Instance.settings;
                     string pureName = settings.SelectedTheme;
                     if (ImGui.BeginCombo("###theme", pureName))
                     {
@@ -96,7 +97,7 @@ public class MenuBar
                             if (ImGui.Selectable(item.Key, selected))
                             {
                                 settings.SelectedTheme = item.Key;
-                                SettingsManager.Instance.Save();
+                                settingsMgr.Save();
                                 ThemesManager.Instance.SetTheme(item.Key);
                             }
 
