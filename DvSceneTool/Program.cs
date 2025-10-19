@@ -11,7 +11,7 @@ using System.Diagnostics;
 
 class DvSceneToolApp : GameWindow
 {
-    public static string Version = "0.0.3";
+    public static string Version = "0.0.4";
     static DvSceneToolApp instance;
     public static DvSceneToolApp Instance { get { return instance; } }
 
