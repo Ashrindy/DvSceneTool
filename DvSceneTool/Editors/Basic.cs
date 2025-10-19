@@ -123,12 +123,15 @@ static class Basic
     {
         bool changed = false;
         ImGui.BeginGroup();
-        if(ImGui.BeginCombo(label, value.Values.ToArray()[value.Value].Key))
+        int valueV = value.Value;
+        if (ImGui.BeginCombo(label, value.Values.ToList().Find(x => x.Value == valueV).Key))
         {
             foreach (var item in value.Values) {
                 bool selected = (value.Value == item.Value);
-                if (changed |= ImGui.Selectable(item.Key, selected))
+                if (ImGui.Selectable(item.Key, selected)) {
                     value.Value = item.Value;
+                    changed |= true;
+                }
 
                 if (selected)
                     ImGui.SetItemDefaultFocus();

@@ -24,6 +24,7 @@ class ResourceList : Panel
             for (int x = 0; x < ctx.LoadedScene.Resource.Entries.Count; x++)
             {
                 var i = ctx.LoadedScene.Resource.Entries[x];
+                ImGui.PushID(i.Guid.ToString());
                 if (ImGui.Selectable($"{i.Name} - {i.Type.ToString()}", ctx.SelectedResource == i))
                     ctx.SelectedResource = i;
 
@@ -34,6 +35,7 @@ class ResourceList : Panel
 
                     ImGui.EndPopup();
                 }
+                ImGui.PopID();
             }
         }
     }
