@@ -1,20 +1,37 @@
 ﻿using Hexa.NET.ImGui;
-using Hexa.NET.ImGui.Widgets.Dialogs;
 using System.Text.Json;
-using System.Threading.Channels;
+using NativeFileDialogNET;
 
 namespace DvSceneTool;
 
 public class MenuBar
 {
     Context ctx { get; }
-    public OpenFileDialog ofd = new() { OnlyAllowFilteredExtensions = true, AllowedExtensions = { ".dvscene" } };
-    public SaveFileDialog sfd = new() { OnlyAllowFilteredExtensions = true, AllowedExtensions = { ".dvscene" } };
+    public NativeFileDialog ofd = new();
+    public NativeFileDialog sfd = new();
 
     void New() => ctx.CreateFile();
-    void Open() => ofd.Show();
+    void Open()
+    {
+        ofd.SelectFile();
+        ofd.AddFilter("DvScene", "dvscene");
+        string? path = null;
+        var result = ofd.Open(out path);
+
+        if (result == DialogResult.Okay)
+            ctx.LoadFile(path);
+    }
     void Save() => ctx.SaveFile(ctx.LoadedScenePath);
-    void SaveAs() => sfd.Show();
+    void SaveAs()
+    {
+        sfd.SaveFile();
+        sfd.AddFilter("DvScene", "dvscene");
+        string? path = null;
+        var result = sfd.Open(out path);
+
+        if (result == DialogResult.Okay)
+            ctx.SaveFile(path);
+    }
 
     bool CanNew() => ctx.DiEvtDB != null;
     bool CanOpen() => ctx.DiEvtDB != null;
@@ -144,26 +161,6 @@ public class MenuBar
             ImGui.Text(versionText);
 
             ImGui.EndMainMenuBar();
-        }
-
-        ofd.Draw(0);
-        sfd.Draw(0);
-
-        if(ofd.Result == DialogResult.Yes && ofd.SelectedFile != null)
-        {
-            foreach (var file in ofd.Selection)
-                ctx.LoadFile(file);
-            ofd.Reset();
-            ofd.Close();
-        }
-
-        if (sfd.Result == DialogResult.Yes && sfd.SelectedFile != null)
-        {
-            if(ctx.LoadedScenePath == "")
-                ctx.LoadedScenePath = sfd.SelectedFile;
-            ctx.SaveFile(sfd.SelectedFile);
-            sfd.Reset();
-            sfd.Close();
         }
     }
 }
