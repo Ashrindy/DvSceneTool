@@ -56,6 +56,14 @@ public sealed class Context
         panels.Add(panel);
     }
 
+    public T GetPanel<T>() where T : Panel
+    {
+        foreach (var panel in panels)
+            if (typeof(T) == panel.GetType())
+                return (T)panel;
+        return null;
+    }
+
     public Context()
     {
         _ = SettingsManager.Instance;
@@ -68,6 +76,7 @@ public sealed class Context
         AddPanel<ResourceInspector>();
         AddPanel<DvSceneSettings>();
         AddPanel<PageEditor>();
+        AddPanel<Timeline>();
 
         if (Directory.Exists("templates"))
             foreach(var i in Directory.GetFiles("templates"))

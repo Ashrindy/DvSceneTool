@@ -11,7 +11,7 @@ using System.Diagnostics;
 
 class DvSceneToolApp : GameWindow
 {
-    public static string Version = "0.0.5";
+    public static string Version = "0.1.0";
     static DvSceneToolApp instance;
     public static DvSceneToolApp Instance { get { return instance; } }
 
@@ -158,8 +158,14 @@ class DvSceneToolApp : GameWindow
         };
 
         instance = new DvSceneToolApp(gameSettings, nativeSettings);
-        foreach (var i in args)
-            DvSceneTool.Context.Instance.LoadFile(i);
+        for (int i = 0; i < args.Length; i++)
+        {
+            var x = args[i];
+            if (x.ToLower() == "-t")
+                DvSceneTool.Context.Instance.OpenDatabase(args[i++]);
+            else
+                DvSceneTool.Context.Instance.LoadFile(x);
+        }
         instance.Run();
     }
 }

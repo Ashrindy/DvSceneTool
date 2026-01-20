@@ -1,84 +1,13 @@
 ﻿using DvSceneLib;
 using DvSceneTool.Editors;
 using System.Numerics;
-using Hexa.NET.ImPlot;
 using Hexa.NET.ImGui;
-using MathNet.Numerics;
 
 namespace DvSceneTool.Panels;
 
 class NodeInspector : Panel
 {
     public NodeInspector(Context ctx) : base(ctx) { }
-
-    bool EditorCurve(string name, ref float[] rValue)
-    {
-        bool changed = false;
-        if (ImPlot.BeginPlot(name, new Vector2(512, 256), ImPlotFlags.CanvasOnly | ImPlotFlags.NoInputs))
-        {
-            if (ImGui.BeginPopupContextItem("Controls"))
-            {
-                ImGui.SeparatorText("Curve Editing Settings");
-                Basic.Editor("Falloff", ref ctx.CurveInfo.Falloff);
-                ImGui.SeparatorText("Custom Curve");
-                Basic.Editor("Decreasing", ref ctx.CurveInfo.Decreasing);
-                ImGui.SameLine();
-                int type = (int)ctx.CurveInfo.Type;
-                if (ImGui.Combo("Curve Type", ref type, Enum.GetNames(typeof(Context.CurveSettings.CurveType)), 7)) 
-                    ctx.CurveInfo.Type = (Context.CurveSettings.CurveType)type; 
-                if (ImGui.Selectable("Generate Curve"))
-                    Utilities.GenerateCurve(rValue, type, ctx.CurveInfo.Decreasing);
-                ImGui.EndPopup();
-            }
-
-            Vector4 color = new Vector4(0.31f, 0.69f, 0.776f, 1.0f);
-            ImPlot.SetupAxis(ImAxis.X1, "Time", ImPlotAxisFlags.NoDecorations | ImPlotAxisFlags.Lock | ImPlotAxisFlags.LockMin | ImPlotAxisFlags.LockMax);
-            ImPlot.SetupAxis(ImAxis.Y1, "Value", ImPlotAxisFlags.AutoFit | ImPlotAxisFlags.NoDecorations);
-            ImPlot.SetupAxisLimits(ImAxis.X1, 0, rValue.Length, ImPlotCond.Always);
-            ImPlot.SetupAxisLimits(ImAxis.Y1, 0, 1, ImPlotCond.Always);
-            float[] time = Enumerable.Range(0, rValue.Length).Select(i => (float)i).ToArray();
-            ImPlot.SetNextFillStyle(color, 0.3f);
-            unsafe
-            {
-                fixed (float* timeX = &time[0])
-                fixed (float* valueX = &rValue[0])
-                    ImPlot.PlotLine("X", timeX, valueX, rValue.Length, ImPlotLineFlags.Shaded);
-            }
-
-            for (int i = 0; i < rValue.Length; i++)
-            {
-                double frame = i;
-                double value = rValue[i];
-                bool clicked = false;
-                bool hovered = false;
-                bool held = false;
-
-                if (changed |= ImPlot.DragPoint(i, ref frame, ref value, color, 4, ref clicked, ref hovered, ref held))
-                {
-                    value = Math.Clamp(value, 0, 1);
-
-                    double sigma = Context.Instance.CurveInfo.Falloff;
-                    double delta = value - rValue[i];
-
-                    for (int x = 0; x < rValue.Length; x++)
-                    {
-                        double dist = x - i;
-                        double weight = Math.Exp(-(dist * dist) / (sigma * sigma));
-                        rValue[x] += (float)(weight * delta);
-                        rValue[x] = Math.Clamp(rValue[x], 0, 1);
-                    }
-                }
-
-                if (hovered || held)
-                    ImGui.SetTooltip($"Frame: {i}\nValue: {value}");
-            }
-
-            ImPlot.EndPlot();
-        }
-        ImGui.SameLine();
-        ImGui.Text(name);
-        return changed;
-    }
 
     bool Editor(string name, ref DvNodeTemplate.Field field)
     {
@@ -183,7 +112,7 @@ class NodeInspector : Panel
             case DvNodeTemplate.DataType.Curve:
                 {
                     float[] rValue = (float[])field.Value;
-                    if(changed |= EditorCurve(name, ref rValue)) field.Value = rValue;
+                    if(changed |= Editors.DvScene.EditorCurve(name, ref rValue, ctx.CurveInfo)) field.Value = rValue;
                     break;
                 }
 
@@ -369,7 +298,27 @@ class NodeInspector : Panel
         {
             var key = fields.Keys.ToList()[i];
             var value = fields.Values.ToList()[i];
-            if(changed |= Editor(key, ref value)) fields[key] = value;
+
+            bool ticks = false;
+            var keyLower = key.ToLower();
+            if (keyLower.Contains("start") || keyLower.Contains("end"))
+            {
+                if (ticks = value.DataType == DvNodeTemplate.DataType.UInt)
+                {
+                    value.Value = ((float)(uint)value.Value) / 100;
+                    value.DataType = DvNodeTemplate.DataType.Float;
+                }
+            }
+
+            if(changed |= Editor(key, ref value))
+            {
+                if (ticks)
+                {
+                    value.Value = (uint)((float)value.Value * 100);
+                    value.DataType = DvNodeTemplate.DataType.UInt;
+                }
+                fields[key] = value;
+            }
         }
         return changed;
     }
