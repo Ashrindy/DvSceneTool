@@ -6,6 +6,8 @@
 
 An editor powered by <a href="https://github.com/Ashrindy/DvSceneLib">DvSceneLib</a>, <a href="https://github.com/HexaEngine/Hexa.NET.ImGui">Hexa.NET.ImGui</a> (<a href="https://github.com/ocornut/imgui">imgui</a>) and <a href="https://opentk.net/">OpenTK</a>, serving the only function of editing the DvScene files!
 
+![DvSceneTool](/.github/screenshot.png)
+
 ## 🗃 Dependencies 🗃
 
 |                                   Name                                    |                          Use                           |
