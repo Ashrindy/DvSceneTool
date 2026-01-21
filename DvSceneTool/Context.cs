@@ -221,6 +221,9 @@ public sealed class Context
     #region Loaded Scene Handling
     public void LoadFile(string file)
     {
+        if (Path.GetExtension(file) != ".dvscene")
+            return;
+
         Selected = null;
         SelectedResource = null;
         LoadedScene = new();

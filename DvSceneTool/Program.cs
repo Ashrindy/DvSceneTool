@@ -11,7 +11,7 @@ using System.Diagnostics;
 
 class DvSceneToolApp : GameWindow
 {
-    public static string Version = "0.1.0";
+    public static string Version = "0.1.1";
     static DvSceneToolApp instance;
     public static DvSceneToolApp Instance { get { return instance; } }
 
@@ -25,6 +25,13 @@ class DvSceneToolApp : GameWindow
     {
         InitImGUI();
         stopWatch.Start();
+        FileDrop += OnFileDrop;
+    }
+
+    void OnFileDrop(FileDropEventArgs e)
+    {
+        foreach (var i in e.FileNames)
+            DvSceneTool.Context.Instance.LoadFile(i);
     }
 
     void InitImGUI()
