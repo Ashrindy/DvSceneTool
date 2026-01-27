@@ -172,12 +172,31 @@ class Timeline : Panel
                 {
                     var cutInfo = ctx.LoadedScene.Common.CutInfo;
 
+                    if (ImGui.BeginPopupContextItem($"cutcontrols"))
+                    {
+                        if (ImGui.MenuItem("Add"))
+                            cutInfo.FrameCut.Add(0);
+
+                        ImGui.EndPopup();
+                    }
+
                     for (int i = 0; i < cutInfo.FrameCut.Count; i++) {
                         var x = cutInfo.FrameCut[i];
 
                         bool clicked = false;
                         if (ImTimeline.Event($"cut{i}", ref x, ref clicked))
                             cutInfo.FrameCut[i] = x;
+
+                        if (ImGui.BeginPopupContextItem($"cut{i}controls"))
+                        {
+                            if (ImGui.MenuItem("Remove"))
+                            {
+                                cutInfo.FrameCut.RemoveAt(i);
+                                ImGui.CloseCurrentPopup();
+                            }
+
+                            ImGui.EndPopup();
+                        }
                     }
 
                     ImTimeline.EndTrack();
@@ -187,6 +206,14 @@ class Timeline : Panel
                 {
                     var cutInfo = ctx.LoadedScene.Common.ResourceCutInfo;
 
+                    if (ImGui.BeginPopupContextItem($"rescutcontrols"))
+                    {
+                        if (ImGui.MenuItem("Add"))
+                            cutInfo.Frames.Add(0);
+
+                        ImGui.EndPopup();
+                    }
+
                     for (int i = 0; i < cutInfo.Frames.Count; i++)
                     {
                         var x = cutInfo.Frames[i];
@@ -194,6 +221,17 @@ class Timeline : Panel
                         bool clicked = false;
                         if (ImTimeline.Event($"rescut{i}", ref x, ref clicked))
                             cutInfo.Frames[i] = x;
+
+                        if (ImGui.BeginPopupContextItem($"rescut{i}controls"))
+                        {
+                            if (ImGui.MenuItem("Remove"))
+                            {
+                                cutInfo.Frames.RemoveAt(i);
+                                ImGui.CloseCurrentPopup();
+                            }
+
+                            ImGui.EndPopup();
+                        }
                     }
 
                     ImTimeline.EndTrack();
