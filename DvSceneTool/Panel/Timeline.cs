@@ -138,7 +138,7 @@ class Timeline : Panel
                             }
                         }
 
-                        if (startName != "" && endName != "")
+                        if (startName != "" && endName != "" && start != end)
                         {
                             bool changed = RenderClip(ref start, ref end, RenderClipCurve);
 

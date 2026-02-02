@@ -108,12 +108,10 @@ class NodeHierarchy : Panel
         else
             isOpen = ImGui.TreeNodeEx(nodeName, flags);
 
-        if (ImGui.IsItemClicked(ImGuiMouseButton.Left))
+        if (ImGui.IsItemClicked(ImGuiMouseButton.Left) && !ImGui.IsMouseDragging(ImGuiMouseButton.Left))
         {
-            ImGuiP.ClearActiveID();
             ctx.Selected = node;
         }
-
 
         if (node != ctx.LoadedScene.Common.Node && ImGui.BeginDragDropSource())
         {
